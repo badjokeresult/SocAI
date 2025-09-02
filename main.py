@@ -36,16 +36,7 @@ for epoch in range(epochs):
         print(f'Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}')
 
 # Тестирование на всех данных
-test_data = torch.tensor(data, dtype=torch.float32)
-model.eval()
-with torch.no_grad():
-    reconstructed = model(test_data)
-    mse = torch.mean((test_data - reconstructed)**2, dim=1).numpy()
 
-# Порог: средняя MSE на нормальных + 3 std
-normal_mse = mse[:1000]
-threshold = np.mean(normal_mse) + 3 * np.std(normal_mse)
-print(f'Threshold: {threshold:.4f}')
 
 # Детекция
 predictions = (mse > threshold).astype(int)
