@@ -16,7 +16,7 @@ class Autoencoder(nn.Module):
             nn.ReLU(),
             nn.Linear(32, input_dim)
         )
-        self.double()
+        #self.double()
 
     def forward(self, x):
         encoded = self.encoder(x)
