@@ -91,7 +91,7 @@ if __name__ == "__main__":
 # Обучение модели
     print("Обучение модели...")
     model = Autoencoder(input_dim=train_tensor.shape[1])
-    model.fit(nn.MSELoss().double(), torch.optim.Adam(model.parameters(), lr=0.001), train_data, epochs=50, batch_size=128, verbose=True)
+    model.fit(nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=0.001), train_data, epochs=50, batch_size=128, verbose=True)
     mse, threshold = model.test(test_data)
     print(f"Threshold: {threshold}")
     model.save("autoencoder.pth")
