@@ -56,7 +56,7 @@ def train_test_split_manual(data, train_ratio=0.8):
 
 # 4. Преобразование в тензоры
 def to_tensor(data):
-    return torch.tensor(data, dtype=torch.int64)
+    return torch.tensor(data, dtype=torch.float)
 
 
 if __name__ == "__main__":
