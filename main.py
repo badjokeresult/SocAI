@@ -17,7 +17,7 @@ def validate_and_convert(data):
         for val in row:
             if not isinstance(val, (int, float)):
                 raise ValueError(f"Найден нечисловой элемент: {val}")
-        row[:] = [int(x) for x in row]  # Преобразуем в float
+        row[:] = [float(x) for x in row]  # Преобразуем в float
     return data
 
 # 2. Нормализация (Min-Max Scaling)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     test_data = []
 
     print("Чтение и обработка журналов событий...")
-    paths = ("data/Security.evtx", "data/Microsoft-Windows-Sysmon%4Operational.evtx")
+    paths = (r"C:\Users\obf344\Desktop\Security.evtx", r"C:\Users\obf344\Desktop\Microsoft-Windows-Sysmon%4Operational.evtx")
     for path in paths:
         with Evtx(path) as log:
             for record in log.records():
