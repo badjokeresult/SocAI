@@ -42,9 +42,10 @@ class Autoencoder(nn.Module):
     
     def test(self, data):
         self.eval()
+        test_data = torch.tensor(data, dtype=torch.float)
         with torch.no_grad():
             reconstructed = self(torch.tensor(data, dtype=torch.float))
-            mse = torch.mean((data - reconstructed)**2, dim=1).numpy()
+            mse = torch.mean((test_data - reconstructed)**2, dim=1).numpy()
         return mse, np.mean(mse) + 3 * np.std(mse)
     
     def save(self, path):
