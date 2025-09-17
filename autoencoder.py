@@ -16,7 +16,7 @@ class Autoencoder(nn.Module):
             nn.ReLU(),
             nn.Linear(32, input_dim)
         )
-        self.float()
+        self.double()
 
     def forward(self, x):
         encoded = self.encoder(x)
@@ -25,7 +25,7 @@ class Autoencoder(nn.Module):
     
     def fit(self, criterion, optimizer, data, epochs=50, batch_size=128, verbose=False):
         self.train()
-        dataset = torch.utils.data.TensorDataset(torch.tensor(data, dtype=torch.float))
+        dataset = torch.utils.data.TensorDataset(torch.tensor(data, dtype=torch.double))
         loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
         for epoch in range(epochs):
             epoch_loss = 0
@@ -42,9 +42,9 @@ class Autoencoder(nn.Module):
     
     def test(self, data):
         self.eval()
-        test_data = torch.tensor(data, dtype=torch.float)
+        test_data = torch.tensor(data, dtype=torch.double)
         with torch.no_grad():
-            reconstructed = self(torch.tensor(data, dtype=torch.float))
+            reconstructed = self(torch.tensor(data, dtype=torch.double))
             mse = torch.mean((test_data - reconstructed)**2, dim=1).numpy()
         return mse, np.mean(mse) + 3 * np.std(mse)
     

@@ -5,6 +5,7 @@ from Evtx.Evtx import Evtx
 from evtlog import EvtLog
 import xmltodict
 from autoencoder import Autoencoder
+import concurrent.futures
 import torch.nn as nn
 
 # 1. Проверка структуры и преобразование в float
@@ -56,44 +57,74 @@ def train_test_split_manual(data, train_ratio=0.8):
 
 # 4. Преобразование в тензоры
 def to_tensor(data):
-    return torch.tensor(data, dtype=torch.float)
+    return torch.tensor(data, dtype=torch.double)
+
+
+def read_evtx(path):
+    evtx_records = []
+    with Evtx(path) as log:
+        for record in log.records():
+            json = xmltodict.parse(record.xml())
+            evtx_records.append(EvtLog(json["Event"]["System"]["EventID"]["#text"], json["Event"]["System"]["TimeCreated"]["@SystemTime"], json["Event"]["System"]["Channel"], json["Event"]["System"]["Computer"], json["Event"]["EventData"]["Data"]).get_values())
+    return evtx_records
 
 
 if __name__ == "__main__":
-    test_data = []
+#     test_data = []
+#     threads = []
+#     paths = (r"C:\Users\obf344\Desktop\Security.evtx", r"C:\Users\obf344\Desktop\Microsoft-Windows-Sysmon%4Operational.evtx")
 
-    print("Чтение и обработка журналов событий...")
-    paths = (r"C:\Users\obf344\Desktop\Security.evtx", r"C:\Users\obf344\Desktop\Microsoft-Windows-Sysmon%4Operational.evtx")
-    for path in paths:
-        with Evtx(path) as log:
-            for record in log.records():
-                json = xmltodict.parse(record.xml())
-                test_data.append(EvtLog(json["Event"]["System"]["EventID"]["#text"], json["Event"]["System"]["TimeCreated"]["@SystemTime"], json["Event"]["System"]["Channel"], json["Event"]["System"]["Computer"], json["Event"]["EventData"]["Data"]).get_values())
-    # Проверка и преобразование
-    data = validate_and_convert(test_data)
+#     print("Чтение и обработка журналов событий...")
+#     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+#         future_to_path = {executor.submit(read_evtx, path): path for path in paths}
+#         for future in concurrent.futures.as_completed(future_to_path):
+#             pth = future_to_path[future]
+#             test_data.extend(future.result())
 
-    print("Обработка данных завершена.")
-# Нормализация
-    normalized_data, min_vals, max_vals = normalize_data(data)
-    #print("Нормализованные данные:", normalized_data)
+#     # Проверка и преобразование
+#     data = validate_and_convert(test_data)
 
-# Разделение
-    train_data, test_data = train_test_split_manual(normalized_data)
-    #print("Обучающие данные:", train_data)
-    #print("Тестовые данные:", test_data)
+#     print("Обработка данных завершена.")
+# # Нормализация
+#     normalized_data, min_vals, max_vals = normalize_data(data)
+#     #print("Нормализованные данные:", normalized_data)
 
-# Преобразование в тензоры
-    train_tensor = to_tensor(train_data)
-    test_tensor = to_tensor(test_data)
-#print("Обучающий тензор:", train_tensor)
-#print("Тестовый тензор:", test_tensor)
+# # Разделение
+#     train_data, test_data = train_test_split_manual(normalized_data)
+#     #print("Обучающие данные:", train_data)
+#     #print("Тестовые данные:", test_data)
 
-# Обучение модели
-    print("Обучение модели...")
-    model = Autoencoder(input_dim=train_tensor.shape[1])
-    model.fit(nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=0.001), train_data, epochs=50, batch_size=128, verbose=True)
-    mse, threshold = model.test(test_data)
-    print(f"Threshold: {threshold}")
-    model.save("autoencoder.pth")
-    # Загрузка модели
+# # Преобразование в тензоры
+#     train_tensor = to_tensor(train_data)
+#     test_tensor = to_tensor(test_data)
+# #print("Обучающий тензор:", train_tensor)
+# #print("Тестовый тензор:", test_tensor)
 
+# # Обучение модели
+#     print("Обучение модели...")
+#     model = Autoencoder(input_dim=train_tensor.shape[1])
+#     model.fit(nn.MSELoss(), torch.optim.Adam(model.parameters(), lr=0.001), train_data, epochs=50, batch_size=128, verbose=True)
+#     mse, threshold = model.test(test_data)
+#     print(f"Threshold: {threshold}")
+#     anomalies = model.detect(mse, threshold)
+#     print(f"Anomalies:{anomalies}")
+#     model.save("autoencoder.pth")
+    import win32evtlog
+
+    h = win32evtlog.OpenEventLog("pkobf059", "Application")
+    records = win32evtlog.ReadEventLog(h, win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ, 0)
+    print(f"""
+            Reserver: {records[0].Reserved}
+            RecordNumber: {records[0].RecordNumber}
+            ClosingRecordNumber: {records[0].ClosingRecordNumber}
+            ComputerName: {records[0].ComputerName}
+            Data: {records[0].Data}
+            EventCategory: {records[0].EventCategory}
+            EventID: {records[0].EventID}
+            EventType: {records[0].EventType}
+            ReservedFlags: {records[0].ReservedFlags}
+            Sid: {records[0].Sid}
+            SourceName: {records[0].SourceName}
+            StringInserts: {records[0].StringInserts}
+            TimeGenerated: {records[0].TimeGenerated}
+            TimeWritten: {records[0].TimeWritten}""")
