@@ -7,3 +7,6 @@ env/
 venv/
 data/
 *.pth
+.vs/
+obj/
+bin/

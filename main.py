@@ -110,9 +110,12 @@ if __name__ == "__main__":
 #     print(f"Anomalies:{anomalies}")
 #     model.save("autoencoder.pth")
     import win32evtlog
+    import win32evtlogutil
 
-    h = win32evtlog.OpenEventLog("pkobf059", "Application")
+    h = win32evtlog.OpenEventLog("pkobf059", "Security")
     records = win32evtlog.ReadEventLog(h, win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ, 0)
+    message = win32evtlogutil.SafeFormatMessage(records[0], "Security")
+    print(message)
     print(f"""
             Reserver: {records[0].Reserved}
             RecordNumber: {records[0].RecordNumber}
@@ -128,3 +131,4 @@ if __name__ == "__main__":
             StringInserts: {records[0].StringInserts}
             TimeGenerated: {records[0].TimeGenerated}
             TimeWritten: {records[0].TimeWritten}""")
+    win32evtlog.CloseEventLog(h)
