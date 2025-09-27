@@ -14,7 +14,7 @@ class EvtLog:
         self.channel = int(sha256(channel.encode("utf-8")).hexdigest(), 16) % 2**64 if channel else 0
         self.computer = int(sha256(computer.encode("utf-8")).hexdigest(), 16) % 2**64 if computer else 0
         event_datas = []
-        #print(event_data)
+
         for ed in event_data:
             event_datas.append(hash(EventData(ed)))
         self.event_data = reduce(lambda x, y: x + y, event_datas) % 2 ** 64 if event_datas else 0

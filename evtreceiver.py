@@ -16,4 +16,8 @@ class EvtLogReceiver:
         with Evtx(self.log_path) as log:
             for event in log.records():
                 dict_event = xmltodict.parse(event)
-                yield EvtLog(dict_event["Event"]["System"]["EventID"]["#text"], dict_event["Event"]["System"]["TimeCreated"]["@SystemTime"], dict_event["Event"]["System"]["Channel"], dict_event["Event"]["System"]["Computer"], dict_event["Event"]["EventData"]["Data"]).get_values()
+                yield EvtLog(dict_event["Event"]["System"]["EventID"]["#text"],
+                             dict_event["Event"]["System"]["TimeCreated"]["@SystemTime"],
+                             dict_event["Event"]["System"]["Channel"],
+                             dict_event["Event"]["System"]["Computer"],
+                             dict_event["Event"]["EventData"]["Data"]).get_values()
